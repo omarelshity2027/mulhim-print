@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>ملهم طباعة</title>
+<style>
+:root{--bg:#f4f5f0;--card:#fff;--ink:#141414;--mute:#6b6f66;--lime:#8cc63f;--lime-s:#e6f2d2;--line:#e4e6dd;--red:#d64545;--amber:#ffe9a8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Cairo","Segoe UI",Tahoma,sans-serif;font-size:15px}
+.app{display:flex;min-height:100vh}
+.side{width:216px;background:var(--ink);color:#f4f5f0;padding:18px 12px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;flex-shrink:0}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:21px;padding:0 6px 16px}
+.brand svg{width:42px;height:42px;background:#fff;border-radius:12px;padding:3px}
+.side button{display:flex;align-items:center;gap:11px;border:0;background:transparent;color:#cfd3c7;font:700 15px inherit;font-family:inherit;padding:11px 12px;border-radius:14px;cursor:pointer;text-align:right}
+.side button:hover{background:#262a22}.side button.on{background:var(--lime);color:#141414}
+.side svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.side .bd{margin-inline-start:auto;background:var(--red);color:#fff;border-radius:999px;font-size:12px;padding:1px 8px}
+.ver{margin-top:auto;color:#7d8276;font-size:12px;padding:6px}
+.main{flex:1;min-width:0;padding:20px 24px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.top h1{margin:0;font-size:26px;font-weight:900}
+.chips2{display:flex;gap:8px;flex-wrap:wrap}.chip2{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-weight:700;font-size:13px}.chip2 b{color:#4c7a14}
+h2{font-size:18px;margin:0 0 12px;font-weight:900}h3{font-size:14px;margin:14px 0 6px;color:var(--mute)}
+.card{background:var(--card);border-radius:20px;padding:18px;border:1px solid var(--line);margin-bottom:14px}
+.cols{display:grid;grid-template-columns:1.35fr 1fr;gap:14px;align-items:start}
+@media(max-width:1000px){.cols{grid-template-columns:1fr}.side{width:76px}.side span,.brand b,.ver{display:none}.side .bd{position:absolute;margin:0}}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0}
+label.f{font-size:12px;font-weight:700;color:var(--mute);display:block;margin-bottom:3px}
+input,select,textarea{width:100%;font:700 15px inherit;font-family:inherit;padding:9px 11px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:var(--ink)}
+input:focus,select:focus{outline:2px solid var(--lime);border-color:var(--lime)}
+input[type=checkbox]{width:19px;height:19px;accent-color:#8cc63f;padding:0;flex-shrink:0}
+.ck{display:flex;align-items:center;gap:8px;font-weight:700;padding:6px 0;cursor:pointer}
+.btn{border:0;font:900 15px inherit;font-family:inherit;padding:11px 20px;border-radius:999px;background:var(--ink);color:var(--lime);cursor:pointer}
+.btn.lime{background:var(--lime);color:#141414}.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}.btn.sm{padding:6px 13px;font-size:13px}.btn.red{background:transparent;color:var(--red);border:1.5px solid var(--red)}.btn:disabled{opacity:.4;cursor:not-allowed}
+.mute{color:var(--mute);font-size:13px}
+.dz{border:2.5px dashed var(--line);border-radius:18px;padding:26px;text-align:center;background:var(--bg)}
+.file{display:flex;gap:12px;align-items:center;background:var(--lime-s);padding:12px 14px;border-radius:16px}
+.file img{width:54px;height:54px;object-fit:cover;border-radius:10px}.file .nm{flex:1;font-weight:800;word-break:break-all}
+details{margin-top:10px;border:1px solid var(--line);border-radius:14px;padding:8px 12px}summary{cursor:pointer;font-weight:800}
+.prev{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}.prev figure{margin:0;text-align:center;font-size:12px;color:var(--mute)}
+.mc{display:grid;gap:8px;margin-bottom:12px}
+.chip{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:14px;padding:9px 12px;cursor:pointer;font-weight:700}
+.chip.on{border-color:var(--lime);background:var(--lime-s)}.chip span{flex:1}.chip b{font-size:21px}
+.sum{background:var(--ink);color:#f4f5f0;border-radius:16px;padding:12px 14px;margin-bottom:12px}
+.sum div{display:flex;justify-content:space-between;padding:2px 0;color:#b9beb0;font-size:14px}.sum b{color:var(--lime)}
+.sum .t{font-size:18px;color:#fff;border-top:1px solid #3a3e35;margin-top:6px;padding-top:7px}
+.acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.job{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:10px}
+.tag{background:var(--lime-s);padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.tag.printing{background:var(--amber)}.tag.failed{background:#ffd6d6}.tag.cancelled,.tag.done{background:#e9eae4}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.m{background:var(--bg);border-radius:16px;padding:13px;border:1px solid var(--line)}.m .n{font-size:26px;font-weight:900;line-height:1.25}
+.hero{background:var(--ink);color:#f4f5f0;display:flex;gap:24px;flex-wrap:wrap;align-items:center}.hero .big{font-size:44px;font-weight:900;color:var(--lime);line-height:1}
+.row{display:grid;gap:8px;align-items:center;margin-bottom:8px}
+.r6{grid-template-columns:1.6fr .9fr .9fr .9fr .9fr .7fr}.r5{grid-template-columns:2fr 1fr auto auto auto}
+.empty{color:var(--mute);text-align:center;padding:18px}
+.warn{background:var(--amber);border-radius:12px;padding:10px 14px;font-weight:700;margin-bottom:12px}
+.lock{background:#e9eae4;border-radius:12px;padding:10px 14px;font-weight:700;margin-bottom:12px}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:right;padding:8px;border-bottom:1px solid var(--line)}th{color:var(--mute);font-size:12px}
+.pos{color:#3d7a14}.neg{color:var(--red)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--lime);padding:12px 22px;border-radius:999px;font-weight:700;opacity:0;pointer-events:none;transition:opacity .25s;z-index:9}.toast.on{opacity:1}
+#rep{display:none}
+@media print{.app,.toast{display:none!important}#rep{display:block;direction:rtl;font-family:Cairo,Tahoma,sans-serif}#rep table td{padding:6px 10px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="6" y="26" width="40" height="22" rx="6" fill="#141414"/><rect x="13" y="12" width="26" height="18" rx="3" fill="#fff" stroke="#141414" stroke-width="3"/><rect x="13" y="44" width="26" height="9" rx="2" fill="#fff" stroke="#141414" stroke-width="3"/><circle cx="38" cy="35" r="2.5" fill="#8cc63f"/><path d="M33 34v24l6-6 5 10 4-2-5-10h8z" fill="#8cc63f" stroke="#141414" stroke-width="2.5" stroke-linejoin="round"/><path d="M50 28l5-4M53 35h7M45 25l1-6" stroke="#8cc63f" stroke-width="3" stroke-linecap="round"/></svg><b>ملهم طباعة</b></div>
+    <div id="nav" style="display:contents"></div>
+    <div class="ver" id="ver"></div>
+  </aside>
+  <main class="main"><div class="top" id="top"></div><div id="app"></div></main>
+</div>
+<div id="rep"></div><div class="toast" id="toast"></div>
+<script src="shared.js"></script>
+<script>
+let S,tab='new',form,editing=null,found=[],diag='',range='today',info={};
+const today=()=>new Date().toLocaleDateString('en-CA');
+let acc={date:today(),month:today().slice(0,7)};
+const $=s=>document.querySelector(s),AR=n=>Number(n||0).toLocaleString('ar-EG',{maximumFractionDigits:2}),EGP=n=>AR(n)+' ج';
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9),save=()=>api.set(S);
+const sum=(a,f)=>a.reduce((s,x)=>s+(+(typeof f==='function'?f(x):x[f])||0),0);
+const SIZES=['A3','A4','A5','A6','A3+'];
+const LAY={normal:'عادي (صفحة في الوش)',nup2:'صفحتين في الوش',nup4:'٤ صفحات في الوش',booklet:'بوكلت (كتيب)'};
+const PER={normal:1,nup2:2,nup4:4,booklet:2};
+const CATS=['ورق','حبر / تونر','صيانة','كهرباء ومياه','عمالة / يومية','إيجار','أخرى'];
+const ICON={new:'<path d="M12 5v14M5 12h14"/>',queue:'<path d="M4 6h16M4 12h16M4 18h10"/>',pinned:'<path d="M12 17v5M8 3h8l-1 6 3 3H6l3-3z"/>',acc:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 15h2"/>',stats:'<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>',set:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>'};
+const TITLES={new:'ملف جديد',queue:'أوامر الطباعة',pinned:'الملفات الثابتة',acc:'الحسابات والتقفيل',stats:'الإحصائيات',set:'الإعدادات'};
+const DEF={machines:[],papers:[{id:'p1',name:'ورق عادي',single:0.5,duplex:0.9,ss:0,sd:0,bin:''},{id:'p2',name:'ورق جلوسي',single:0,duplex:0,ss:0,sd:0,bin:''},{id:'p3',name:'ورق استيكر',single:0,duplex:0,ss:0,sd:0,bin:''},{id:'p4',name:'ورق كوشيه',single:0,duplex:0,ss:0,sd:0,bin:''}],factors:{A3:2,A4:1,A5:0.5,A6:0.25,'A3+':2.5},driverSize:{},queue:[],pinned:[],history:[],cash:[],closeDay:{},closeMonth:{}};
+function migrate(){
+  S=Object.assign({},DEF,S||{});
+  S.papers.forEach(p=>{p.ss??=0;p.sd??=0;p.bin??=''});
+  S.history.forEach(h=>{h.date??=new Date(h.ts).toLocaleDateString('en-CA');h.price??=0;h.paid??=true;h.id??=uid()});
+  S.queue.forEach(j=>{if(j.status==='printing')j.status='failed'});
+}
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2600)}
+const blank=()=>({file:null,range:'',copies:1,paper:S.papers[0].id,size:'A4',layout:'normal',duplex:true,color:false,rtl:true,subset:'all',reverse:false,margin:'',border:false,fit:'fit',rot:true,bin:'',edge:'auto',note:'',price:'',paid:true,machines:S.machines.filter(m=>m.active).map(m=>m.id)});
+const locked=d=>!!S.closeDay[d]||!!S.closeMonth[d.slice(0,7)];
+const pname=id=>S.papers.find(p=>p.id===id)?.name||'—';
+
+function calc(j){
+  const n=j.file?pages(j.range,j.file.pages,j.subset,false).length:0,dup=j.duplex||j.layout==='booklet';
+  const pad=j.layout==='booklet'?Math.ceil(n/4)*4:n,faces=Math.ceil(pad/PER[j.layout]),sheets=Math.ceil(faces/(dup?2:1));
+  const p=S.papers.find(x=>x.id===j.paper)||{single:0,duplex:0,ss:0,sd:0},fac=S.factors[j.size]||1;
+  const cu=(dup?p.duplex:p.single)*fac,su=(dup?p.sd:p.ss)*fac,sale=sheets*su*j.copies;
+  return{n,sheets,all:sheets*j.copies,cost:sheets*cu*j.copies,sale,price:(j.price!==''&&j.price!=null)?+j.price:sale,dup};
+}
+const alloc=j=>dist(j.copies,S.machines.filter(m=>m.active&&j.machines.includes(m.id)));
+const desc=j=>`${j.size} · ${pname(j.paper)} · ${LAY[j.layout]} · ${calc(j).dup?'وش وضهر':'وش واحد'} · ${j.color?'ألوان':'أبيض وأسود'}${j.subset==='odd'?' · الفردي فقط':j.subset==='even'?' · الزوجي فقط':''}`;
+
+/* ---------- new job ---------- */
+function prevSvg(){
+  const f=form,l=f.layout,land=l==='nup2'||l==='booklet',W=land?150:104,H=land?104:150,cols=(l==='nup4'||land)?2:1,rows=l==='nup4'?2:1,per=cols*rows;
+  const ord=l==='booklet'?bookletOrder(8):[...Array(8).keys()];
+  const face=(i,label)=>{const arr=ord.slice(i*per,(i+1)*per),sw=W/cols,sh=H/rows;
+    return `<figure><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><rect width="${W}" height="${H}" rx="5" fill="#fff" stroke="#141414" stroke-width="2"/>${arr.map((p,k)=>{let c=k%cols;const r=Math.floor(k/cols);if(f.rtl&&cols>1)c=cols-1-c;return p==null?'':`<rect x="${c*sw+5}" y="${r*sh+5}" width="${sw-10}" height="${sh-10}" rx="4" fill="#e6f2d2" stroke="#8cc63f"/><text x="${c*sw+sw/2}" y="${r*sh+sh/2+7}" text-anchor="middle" font-size="20" font-weight="900" font-family="Cairo,sans-serif">${AR(p+1)}</text>`}).join('')}</svg>${label}</figure>`};
+  return `<div class="prev">${face(0,'الوش')}${(f.duplex||l==='booklet')?face(1,'الضهر'):''}</div>`;
+}
+function newTab(){
+  const f=form,c=calc(f);
+  const o=(k,arr)=>arr.map(([v,t])=>`<option value="${v}" ${String(f[k])===String(v)?'selected':''}>${esc(t)}</option>`).join('');
+  const ck=(k,t,dis)=>`<label class="ck"><input type="checkbox" ${f[k]?'checked':''} ${dis?'disabled':''} onchange="upd('${k}',this.checked,1)">${t}</label>`;
+  const tx=(k,l,ph)=>`<div><label class="f">${l}</label><input value="${esc(f[k])}" placeholder="${ph||''}" oninput="upd('${k}',this.value)"></div>`;
+  const file=f.file?`<div class="file">${f.file.type==='img'?`<img src="file:///${encodeURI(f.file.path.replace(/\\/g,'/'))}">`:'<span style="font-size:34px">📄</span>'}<div class="nm">${esc(f.file.name)}<div class="mute">${AR(f.file.pages)} صفحة · هتتطبع ${AR(c.n)}</div></div><button class="btn sm ghost" onclick="pickFile()">تغيير</button><button class="btn sm red" onclick="clearFile()">مسح الملف</button></div>`
+   :`<div class="dz"><div style="font-size:38px">🖨️</div><div style="font-weight:800;margin:6px 0">اسحب الملف هنا أو اختاره من الجهاز</div><button class="btn lime" onclick="pickFile()">اختار ملف أو صورة</button><div class="mute" style="margin-top:8px">PDF · JPG · PNG &nbsp;|&nbsp; ممكن تختار كذا ملف مرة واحدة</div></div>`;
+  return `${!S.machines.length?`<div class="warn">لسه مفيش ماكينات. <a href="#" onclick="go('set');return false">روح الإعدادات</a> واضغط «اكتشاف الطابعات».</div>`:''}
+  <div class="cols"><div>
+   <section class="card"><h2>${editing?(editing.t==='p'?'تعديل ملف ثابت':'تعديل أمر طباعة'):'الملف'}</h2>${file}</section>
+   <section class="card"><h2>إعدادات الطباعة</h2>
+    <div class="g">
+     <div><label class="f">عدد النسخ</label><input type="number" min="1" value="${f.copies}" oninput="upd('copies',Math.max(1,parseInt(this.value)||1))"></div>
+     <div><label class="f">نوع الورق</label><select onchange="upd('paper',this.value,1)">${o('paper',S.papers.map(p=>[p.id,p.name]))}</select></div>
+     <div><label class="f">مقاس الورق</label><select onchange="upd('size',this.value,1)">${o('size',SIZES.map(s=>[s,s]))}</select></div>
+     <div><label class="f">طريقة الصفحات</label><select onchange="upd('layout',this.value,1)">${o('layout',Object.entries(LAY))}</select></div>
+     <div><label class="f">الوش والضهر</label><select onchange="upd('duplex',this.value==='1',1)" ${f.layout==='booklet'?'disabled':''}><option value="1" ${f.duplex||f.layout==='booklet'?'selected':''}>وش وضهر</option><option value="0" ${!f.duplex&&f.layout!=='booklet'?'selected':''}>وش واحد</option></select></div>
+     <div><label class="f">الألوان</label><select onchange="upd('color',this.value==='1',1)"><option value="0" ${!f.color?'selected':''}>أبيض وأسود</option><option value="1" ${f.color?'selected':''}>ألوان</option></select></div>
+     ${tx('range','نطاق الصفحات (فاضي = الكل)','مثال: 1-10, 15')}
+    </div>
+    ${ck('rtl','ترتيب عربي (الصفحة الأولى على اليمين)',f.layout==='normal')}
+    <details><summary>خيارات متقدمة</summary>
+     <div class="g">
+      <div><label class="f">أي صفحات</label><select onchange="upd('subset',this.value,1)">${o('subset',[['all','كل الصفحات'],['odd','الفردي فقط (للوش وضهر يدوي)'],['even','الزوجي فقط']])}</select></div>
+      <div><label class="f">قلب الورقة (وش وضهر)</label><select onchange="upd('edge',this.value,1)">${o('edge',[['auto','تلقائي'],['long','الحافة الطويلة'],['short','الحافة القصيرة']])}</select></div>
+      <div><label class="f">حجم الصفحة على الورقة</label><select onchange="upd('fit',this.value,1)">${o('fit',[['fit','يملى الورقة'],['actual','الحجم الأصلي']])}</select></div>
+      ${tx('margin','هامش (مم)','تلقائي')}${tx('bin','درج الطابعة','حسب نوع الورق')}
+     </div>
+     ${ck('reverse','طباعة بالعكس (من الآخر للأول)')}${ck('rot','تدوير الصفحة العريضة تلقائياً')}${ck('border','إطار حوالين كل صفحة')}
+    </details>
+   </section>
+   <section class="card"><h2>العميل والحساب</h2><div class="g">
+     ${tx('note','اسم العميل / ملاحظة')}${tx('price','المبلغ المتفق عليه','تلقائي من الأسعار')}
+     <div><label class="f">الدفع</label><select onchange="upd('paid',this.value==='1',1)"><option value="1" ${f.paid?'selected':''}>مدفوع</option><option value="0" ${!f.paid?'selected':''}>آجل</option></select></div></div></section>
+  </div><div><section class="card" id="side">${side()}</section></div></div>`;
+}
+function side(){
+  const f=form,c=calc(f),al=alloc(f),p=S.papers.find(x=>x.id===f.paper);
+  return `<h2>ترتيب الصفحات على الورقة</h2>${prevSvg()}<h2>الماكينات</h2>`+(S.machines.some(m=>m.active)?`<div class="mc">${S.machines.map((m,i)=>{if(!m.active)return'';const on=f.machines.includes(m.id);return `<label class="chip ${on?'on':''}"><input type="checkbox" ${on?'checked':''} onchange="togM(${i})"><span>${esc(m.label)}</span><b>${on?AR(al[m.id]||0):'—'}</b></label>`}).join('')}</div>`:'<div class="empty">مفيش ماكينات شغالة</div>')+
+  `<div class="sum"><div>صفحات هتتطبع<b>${AR(c.n)}</b></div><div>ورق للنسخة<b>${AR(c.sheets)}</b></div><div>إجمالي الورق<b>${AR(c.all)}</b></div><div>تكلفة الورق<b>${c.cost?EGP(c.cost):'غير محددة'}</b></div><div class="t">المبلغ<b>${c.price?EGP(c.price):'—'}</b></div>${c.price&&c.cost?`<div>الربح<b>${EGP(c.price-c.cost)}</b></div>`:''}</div>
+  ${!c.price&&f.file?`<div class="mute" style="margin-bottom:10px">سعر البيع لـ«${esc(p?.name||'')}» مش محدد. اكتب المبلغ يدوي أو حدد الأسعار من الإعدادات.</div>`:''}
+  <div class="acts">${editing?`<button class="btn" onclick="submit(0)">حفظ التعديل</button><button class="btn ghost" onclick="cancelEdit()">إلغاء</button>`:`<button class="btn lime" onclick="submit(1)">اطبع الآن</button><button class="btn" onclick="submit(0)">أضف للطابور</button><button class="btn ghost" onclick="pin()">ثبّت الملف</button><button class="btn red sm" onclick="resetForm()">مسح الكل</button>`}</div>`;
+}
+function upd(k,v,full){form[k]=v;if(k==='subset'&&v!=='all')form.duplex=false;if(k==='layout'&&v==='booklet')form.duplex=true;full?render():$('#side').innerHTML=side()}
+function togM(i){const id=S.machines[i].id,a=form.machines,x=a.indexOf(id);x<0?a.push(id):a.splice(x,1);$('#side').innerHTML=side()}
+const clearFile=()=>{form.file=null;render()};
+const resetForm=()=>{form=blank();editing=null;render()};
+async function pickFile(){loadFiles(await api.pick())}
+async function loadFiles(ps){
+  if(!ps.length)return;const fs=[];for(const p of ps)fs.push(await api.info(p));
+  form.file=fs[0];
+  fs.slice(1).forEach(x=>S.queue.push({...form,file:x,machines:[...form.machines],id:uid(),status:'waiting',ts:Date.now()}));
+  if(fs.length>1){save();toast(`اتضاف ${AR(fs.length-1)} ملف للطابور بنفس الإعدادات`)}
+  tab='new';render();
+}
+function valid(){const f=form;if(!f.file)return'اختار ملف الأول';if(!f.machines.some(id=>S.machines.find(m=>m.id===id&&m.active)))return'اختار ماكينة واحدة على الأقل';if(!calc(f).n)return'نطاق الصفحات مش مظبوط';return''}
+function submit(run){
+  const e=valid();if(e)return toast(e);
+  const j={...form,machines:[...form.machines],id:editing?.t==='q'?editing.id:uid(),status:'waiting',ts:Date.now()};
+  if(editing?.t==='p'){S.pinned[editing.i]={...j,id:S.pinned[editing.i].id};toast('اتحفظ التعديل على الثابت');editing=null;form=blank();save();tab='pinned';return render()}
+  if(editing){const i=S.queue.findIndex(x=>x.id===editing.id);i<0?S.queue.push(j):S.queue[i]=j;editing=null}else S.queue.push(j);
+  form=blank();save();
+  if(run){tab='queue';render();runJob(j.id)}else{toast('اتحفظ في الطابور');render()}
+}
+const cancelEdit=()=>{editing=null;form=blank();render()};
+function pin(){const e=valid();if(e)return toast(e);S.pinned.push({...form,machines:[...form.machines],id:uid()});save();toast('الملف اتثبت')}
+
+/* ---------- queue ---------- */
+async function runJob(id){
+  const j=S.queue.find(x=>x.id===id);if(!j||j.status==='printing')return;
+  if(locked(today())){toast('اليوم مقفول. افتحه من «الحسابات» الأول');return}
+  const al=alloc(j);if(!Object.values(al).some(v=>v>0)){j.status='failed';j.err='مفيش ماكينة شغالة مختارة';return render()}
+  j.status='printing';j.err='';j.alloc=al;render();
+  const bin=j.bin||S.papers.find(p=>p.id===j.paper)?.bin||'';
+  const r=await api.run({...j,alloc:al,bin,driverSize:S.driverSize[j.size]||(j.size==='A3+'?'':j.size)});
+  if(j.status==='cancelled'){save();return render()}
+  if(r.ok){const c=calc(j),pd=j.paid!==false;j.status='done';S.history.push({id:uid(),ts:Date.now(),date:today(),name:j.file.name,customer:j.note,path:j.file.path,paper:j.paper,size:j.size,copies:j.copies,sheets:c.all,per:c.sheets,cost:c.cost,price:c.price,paid:pd,paidDate:pd?today():null,alloc:al})}
+  else{j.status='failed';j.err=r.error}
+  save();render();
+}
+async function runAll(){for(const j of S.queue.filter(x=>x.status==='waiting'))await runJob(j.id)}
+async function stopJob(id){const j=S.queue.find(x=>x.id===id);if(!confirm('هيتم إيقاف الأمر ومسح أي ورق معلق في طابور ويندوز للماكينات دي. متأكد؟'))return;await api.cancel(id);j.status='cancelled';render();await api.purge(Object.keys(j.alloc||{}));save();toast('اتوقف')}
+function edit(id){const j=S.queue.find(x=>x.id===id);form={...blank(),...j,machines:[...j.machines]};editing={t:'q',id};tab='new';render()}
+const del=id=>{S.queue=S.queue.filter(x=>x.id!==id);save();render()};
+const dup=id=>{const j=S.queue.find(x=>x.id===id);S.queue.push({...j,id:uid(),status:'waiting',err:'',ts:Date.now()});save();render()};
+const clearQ=all=>{if(!confirm(all?'تمسح كل الأوامر؟':'تمسح الأوامر المنتهية والملغية؟'))return;S.queue=S.queue.filter(j=>j.status==='printing'||(!all&&!['done','cancelled'].includes(j.status)));save();render()};
+const ST={waiting:'مستني',printing:'بيطبع…',done:'تمت',failed:'فشلت',cancelled:'ملغية'};
+function queueTab(){
+  const w=S.queue.filter(j=>j.status==='waiting').length;
+  return `<section class="card"><div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:12px;flex-wrap:wrap"><h2 style="margin:0">الأوامر (${AR(S.queue.length)})</h2><span class="acts">${w?`<button class="btn lime" onclick="runAll()">اطبع كل المستني (${AR(w)})</button>`:''}${S.queue.some(j=>['done','cancelled'].includes(j.status))?`<button class="btn ghost sm" onclick="clearQ(false)">امسح المنتهي</button>`:''}${S.queue.length?`<button class="btn red sm" onclick="clearQ(true)">امسح الكل</button>`:''}</span></div>
+  ${S.queue.length?[...S.queue].reverse().map(j=>{const c=calc(j),al=j.alloc&&j.status!=='waiting'?j.alloc:alloc(j),s=j.status;
+   return `<div class="job"><div><b>${esc(j.file.name)}</b> <span class="tag ${s}">${ST[s]}</span>${j.note?` <span class="mute">· ${esc(j.note)}</span>`:''}${j.paid===false?' <span class="tag failed">آجل</span>':''}
+    <div class="mute">${esc(desc(j))} · ${AR(j.copies)} نسخة · ${AR(c.all)} ورقة${c.price?` · ${EGP(c.price)}`:''}</div>
+    <div class="mute">${Object.entries(al).filter(([,v])=>v).map(([k,v])=>`${esc(S.machines.find(m=>m.id===k)?.label||'؟')}: ${AR(v)}`).join(' | ')}${j.err?` <span class="neg">· ${esc(j.err)}</span>`:''}</div></div>
+    <div class="acts">${s==='printing'?`<button class="btn sm red" onclick="stopJob('${j.id}')">إيقاف</button>`:(s==='waiting'||s==='failed'?`<button class="btn sm lime" onclick="runJob('${j.id}')">${s==='failed'?'جرّب تاني':'اطبع'}</button><button class="btn sm ghost" onclick="edit('${j.id}')">تعديل</button>`:`<button class="btn sm ghost" onclick="dup('${j.id}')">تكرار</button>`)+(s!=='printing'?`<button class="btn sm red" onclick="del('${j.id}')">حذف</button>`:'')}</div></div>`}).join(''):'<div class="empty">الطابور فاضي. ابدأ من «ملف جديد».</div>'}</section>`;
+}
+
+/* ---------- pinned ---------- */
+function pinnedTab(){
+  return `<section class="card"><h2>الملفات الثابتة</h2><p class="mute" style="margin-top:-6px">الملفات اللي بتتطبع كل يوم. الإعدادات محفوظة، اكتب العدد واطبع.</p>
+  <div class="grid">${S.pinned.map((p,i)=>{const t=sum(S.history.filter(h=>h.path===p.file.path&&h.date===today()),'copies');
+   return `<div class="m"><b>${esc(p.file.name)}</b><div class="mute">${esc(desc(p))}</div><div class="n">${AR(t)}</div><div class="mute">اتطبع النهاردة</div>
+   <div style="display:flex;gap:6px;margin:10px 0"><input id="pc${i}" type="number" min="1" value="1"><button class="btn sm lime" onclick="pinPrint(${i},1)">اطبع</button></div>
+   <div class="acts"><button class="btn sm ghost" onclick="pinPrint(${i},0)">للطابور</button><button class="btn sm ghost" onclick="editPin(${i})">تعديل</button><button class="btn sm red" onclick="if(confirm('تشيل الملف من الثابت؟')){S.pinned.splice(${i},1);save();render()}">إزالة</button></div></div>`}).join('')||'<div class="empty">مفيش ملفات متثبتة. جهّز ملف في «ملف جديد» واضغط «ثبّت الملف».</div>'}</div></section>`;
+}
+function pinPrint(i,run){const p=S.pinned[i],c=Math.max(1,parseInt($('#pc'+i).value)||1),j={...p,copies:c,machines:[...p.machines],id:uid(),status:'waiting',ts:Date.now()};S.queue.push(j);save();if(run){tab='queue';render();runJob(j.id)}else{toast('اتضاف للطابور');render()}}
+function editPin(i){form={...blank(),...S.pinned[i],machines:[...S.pinned[i].machines]};editing={t:'p',i};tab='new';render()}
+
+/* ---------- accounts ---------- */
+function tot(match){
+  const H=S.history.filter(h=>match(h.date)),C=S.cash.filter(c=>match(c.date)),col=S.history.filter(h=>h.paid&&match(h.paidDate||h.date));
+  const inn=sum(C.filter(c=>c.type==='in'),'amount'),out=sum(C.filter(c=>c.type==='out'),'amount'),rev=sum(H,'price'),cost=sum(H,'cost'),cash=sum(col,'price');
+  return{H,C,jobs:H.length,copies:sum(H,'copies'),sheets:sum(H,'sheets'),rev,cost,inn,out,debt:sum(H.filter(h=>!h.paid),'price'),cash,expected:cash+inn-out,profit:rev+inn-cost-out};
+}
+const dTot=d=>tot(x=>x===d),mTot=m=>tot(x=>x.startsWith(m));
+const snap=t=>({jobs:t.jobs,copies:t.copies,sheets:t.sheets,rev:t.rev,cost:t.cost,inn:t.inn,out:t.out,debt:t.debt,cash:t.cash,expected:t.expected,profit:t.profit});
+const rowsOf=t=>[['عدد الأوامر',AR(t.jobs)],['عدد النسخ',AR(t.copies)],['عدد الورق',AR(t.sheets)],['إيراد الطباعة',EGP(t.rev)],['إيرادات أخرى',EGP(t.inn)],['تكلفة الورق',EGP(t.cost)],['المصروفات',EGP(t.out)],['صافي الربح',EGP(t.profit)],['آجل جديد',EGP(t.debt)],['الكاش المتوقع في الدرج',EGP(t.expected)]];
+function printRep(title,t,extra){$('#rep').innerHTML=`<h1>ملهم طباعة — ${esc(title)}</h1><table>${[...rowsOf(t),...(extra||[])].map(([a,b])=>`<tr><td>${a}</td><td><b>${b}</b></td></tr>`).join('')}</table>`;window.print()}
+function accTab(){
+  const d=acc.date,t=dTot(d),lk=locked(d),cd=S.closeDay[d],ml=!!S.closeMonth[d.slice(0,7)];
+  const card=(l,v,cl)=>`<div class="m"><div class="mute">${l}</div><div class="n ${cl||''}">${v}</div></div>`;
+  const ops=[...t.H.map(h=>({ts:h.ts,k:'s',h})),...t.C.map(c=>({ts:c.ts,k:'c',c}))].sort((a,b)=>a.ts-b.ts);
+  const debts=S.history.filter(h=>!h.paid);
+  const m=acc.month,mt=mTot(m),cm=S.closeMonth[m],dates=[...new Set([...S.history.map(h=>h.date),...S.cash.map(c=>c.date)])].filter(x=>x.startsWith(m)).sort(),open=dates.filter(x=>!S.closeDay[x]);
+  return `<section class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px"><h2 style="margin:0">يوم</h2><input type="date" style="width:auto" value="${d}" onchange="acc.date=this.value||today();render()"><button class="btn sm ghost" onclick="acc.date=today();render()">النهاردة</button>${lk?`<span class="tag">${cd?'مقفول':'شهره مقفول'}</span>`:''}</div>
+   <div class="grid">${card('إيراد الطباعة',EGP(t.rev))}${card('تكلفة الورق',EGP(t.cost))}${card('المصروفات',EGP(t.out))}${card('صافي الربح',EGP(t.profit),t.profit<0?'neg':'pos')}${card('الورق المطبوع',AR(t.sheets))}${card('آجل جديد',EGP(t.debt))}${card('الكاش المتوقع',EGP(t.expected))}</div>
+   <h3>تقفيل اليوم</h3>
+   ${cd?`<div class="lock">اليوم مقفول — الكاش الفعلي ${EGP(cd.counted)} · ${cd.diff===0?'مفيش فرق ✓':`<span class="${cd.diff<0?'neg':'pos'}">${cd.diff<0?'عجز':'زيادة'} ${EGP(Math.abs(cd.diff))}</span>`}${cd.note?' · '+esc(cd.note):''}</div><div class="acts"><button class="btn sm ghost" onclick="printRep('تقفيل يوم ${d}',dTot('${d}'),[['الكاش الفعلي','${cd.counted}'],['الفرق','${cd.diff}']])">طباعة التقرير</button>${ml?'':`<button class="btn sm red" onclick="reopenDay('${d}')">إعادة فتح اليوم</button>`}</div>`
+   :`<div class="g"><div><label class="f">الكاش الفعلي في الدرج</label><input id="cnt" type="number" placeholder="المتوقع ${AR(t.expected)}"></div><div><label class="f">ملاحظة</label><input id="cnn"></div></div><div class="acts"><button class="btn" onclick="closeDay()">قفّل اليوم</button><button class="btn sm ghost" onclick="printRep('ملخص يوم ${d}',dTot('${d}'))">طباعة الملخص</button></div>`}
+  </section>
+  <section class="card"><h2>عمليات اليوم</h2>${ops.length?`<table><tr><th>الوقت</th><th>البيان</th><th>المبلغ</th><th></th></tr>${ops.map(o=>{const tm=new Date(o.ts).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});
+   return o.k==='s'?`<tr><td>${tm}</td><td>طباعة: ${esc(o.h.name)}${o.h.customer?' · '+esc(o.h.customer):''} ${o.h.paid?'':'<span class="tag failed">آجل</span>'}</td><td class="pos">${EGP(o.h.price)}</td><td>${lk?'':`<button class="btn sm red" onclick="delSale('${o.h.id}')">حذف</button>`}</td></tr>`
+   :`<tr><td>${tm}</td><td>${o.c.type==='in'?'إيراد':'مصروف'}: ${esc(o.c.title||o.c.cat)} <span class="tag">${esc(o.c.cat)}</span></td><td class="${o.c.type==='in'?'pos':'neg'}">${o.c.type==='in'?'+':'−'}${EGP(o.c.amount)}</td><td>${lk?'':`<button class="btn sm red" onclick="delCash('${o.c.id}')">حذف</button>`}</td></tr>`}).join('')}</table>`:'<div class="empty">مفيش عمليات في اليوم ده.</div>'}
+   ${lk?'':`<h3>إضافة مصروف أو إيراد</h3><div class="g"><div><label class="f">النوع</label><select id="cy"><option value="out">مصروف</option><option value="in">إيراد آخر</option></select></div><div><label class="f">التصنيف</label><select id="cc">${CATS.map(x=>`<option>${x}</option>`).join('')}</select></div><div><label class="f">البيان</label><input id="ct"></div><div><label class="f">المبلغ</label><input id="ca" type="number" min="0"></div></div><button class="btn lime" onclick="addCash()">أضف</button>`}</section>
+  <section class="card"><h2>الآجل (${AR(debts.length)} · ${EGP(sum(debts,'price'))})</h2>${debts.length?`<table><tr><th>التاريخ</th><th>العميل / الملف</th><th>المبلغ</th><th></th></tr>${debts.map(h=>`<tr><td>${h.date}</td><td>${esc(h.customer||'—')} · ${esc(h.name)}</td><td>${EGP(h.price)}</td><td><button class="btn sm lime" onclick="collect('${h.id}')">تم التحصيل</button></td></tr>`).join('')}</table>`:'<div class="empty">مفيش آجل.</div>'}</section>
+  <section class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px"><h2 style="margin:0">الشهر</h2><input type="month" style="width:auto" value="${m}" onchange="acc.month=this.value||today().slice(0,7);render()">${cm?'<span class="tag">مقفول</span>':''}</div>
+   <div class="grid">${card('الإيراد',EGP(mt.rev+mt.inn))}${card('تكلفة الورق',EGP(mt.cost))}${card('المصروفات',EGP(mt.out))}${card('صافي الربح',EGP(mt.profit),mt.profit<0?'neg':'pos')}${card('الورق المطبوع',AR(mt.sheets))}${card('أيام شغل',AR(dates.length))}</div>
+   ${cm?'':open.length?`<div class="warn" style="margin-top:12px">لازم تقفّل الأيام دي الأول: ${open.map(x=>`<a href="#" onclick="acc.date='${x}';render();return false">${x}</a>`).join(' · ')}</div>`:''}
+   <div class="acts" style="margin-top:12px">${cm?`<button class="btn sm red" onclick="reopenMonth()">إعادة فتح الشهر</button>`:`<button class="btn" ${open.length||!dates.length?'disabled':''} onclick="closeMonth()">قفّل الشهر</button>`}<button class="btn sm ghost" onclick="printRep('تقرير شهر ${m}',mTot('${m}'))">طباعة التقرير</button><button class="btn sm ghost" onclick="exportMonth()">تصدير Excel</button></div></section>`;
+}
+function addCash(){if(locked(acc.date))return toast('اليوم مقفول');const a=+$('#ca').value;if(!(a>0))return toast('اكتب المبلغ');S.cash.push({id:uid(),ts:Date.now(),date:acc.date,type:$('#cy').value,cat:$('#cc').value,title:$('#ct').value.trim(),amount:a});save();render()}
+function delCash(id){if(confirm('تحذف العملية؟')){S.cash=S.cash.filter(c=>c.id!==id);save();render()}}
+function delSale(id){if(confirm('تحذف عملية الطباعة من الحسابات؟')){S.history=S.history.filter(h=>h.id!==id);save();render()}}
+function collect(id){if(locked(today()))return toast('اليوم مقفول');const h=S.history.find(x=>x.id===id);h.paid=true;h.paidDate=today();save();toast('اتحصّل ودخل كاش النهاردة');render()}
+function closeDay(){const d=acc.date,t=dTot(d),c=$('#cnt').value;if(c==='')return toast('اكتب الكاش الفعلي في الدرج');S.closeDay[d]={ts:Date.now(),counted:+c,diff:+c-t.expected,note:$('#cnn').value.trim(),...snap(t)};save();render()}
+function reopenDay(d){if(S.closeMonth[d.slice(0,7)])return toast('الشهر مقفول');if(confirm('تعيد فتح اليوم؟')){delete S.closeDay[d];save();render()}}
+function closeMonth(){const m=acc.month;if(!confirm('بعد التقفيل مش هتقدر تعدّل أي عملية في الشهر ده. متأكد؟'))return;S.closeMonth[m]={ts:Date.now(),...snap(mTot(m))};save();render()}
+function reopenMonth(){if(confirm('تعيد فتح الشهر؟')){delete S.closeMonth[acc.month];save();render()}}
+async function exportMonth(){const m=acc.month,r=[['التاريخ','النوع','البيان','العميل','المبلغ','الحالة']];S.history.filter(h=>h.date.startsWith(m)).forEach(h=>r.push([h.date,'طباعة',h.name,h.customer||'',h.price,h.paid?'مدفوع':'آجل']));S.cash.filter(c=>c.date.startsWith(m)).forEach(c=>r.push([c.date,c.type==='in'?'إيراد آخر':'مصروف',c.title||c.cat,'',c.amount,'']));if(await api.save({name:`ملهم-${m}.csv`,text:'\ufeff'+r.map(x=>x.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n')}))toast('اتحفظ')}
+
+/* ---------- stats ---------- */
+function statsTab(){
+  const t=range==='today'?dTot(today()):range==='month'?mTot(today().slice(0,7)):tot(()=>true),byM={},byP={};
+  t.H.forEach(h=>{byP[h.paper]=(byP[h.paper]||0)+h.sheets;Object.entries(h.alloc).forEach(([k,v])=>{const o=byM[k]||(byM[k]={c:0,s:0});o.c+=v;o.s+=v*h.per})});
+  const rb=(k,l)=>`<button class="btn sm ${range===k?'lime':'ghost'}" onclick="range='${k}';render()">${l}</button>`;
+  return `<section class="card hero"><div><div class="mute">إجمالي الورق</div><div class="big">${AR(t.sheets)}</div><div class="mute">${AR(t.copies)} نسخة · ${AR(t.jobs)} أمر</div></div><div><div class="mute">إيراد الطباعة</div><div class="big">${AR(t.rev)}</div><div class="mute">جنيه</div></div><div class="acts" style="margin-inline-start:auto">${rb('today','اليوم')}${rb('month','الشهر')}${rb('all','الكل')}</div></section>
+  <section class="card"><h2>كل ماكينة طبعت كام</h2><div class="grid">${S.machines.map(m=>`<div class="m"><b>${esc(m.label)}</b><div class="n">${AR(byM[m.id]?.s)}</div><div class="mute">ورقة · ${AR(byM[m.id]?.c)} نسخة</div></div>`).join('')||'<div class="empty">لسه مفيش ماكينات.</div>'}</div></section>
+  <section class="card"><h2>حسب نوع الورق (ورقة)</h2><div class="grid">${S.papers.map(p=>`<div class="m"><b>${esc(p.name)}</b><div class="n">${AR(byP[p.id])}</div></div>`).join('')}</div></section>`;
+}
+
+/* ---------- settings ---------- */
+async function detect(){diag='بيدوّر على الطابعات…';render();try{const r=await api.printers();found=r.list;diag=found.length?`لقيت ${AR(found.length)} طابعة`:'مالقيتش أي طابعة. تأكد إنها متعرفة في ويندوز (الإعدادات ← الطابعات والماسحات)';if(r.errs.length)diag+=' | '+r.errs.join(' | ')}catch(e){diag='خطأ: '+e.message}render()}
+const addPr=n=>{if(!n||S.machines.some(m=>m.id===n))return;S.machines.push({id:n,label:'ماكينة '+AR(S.machines.length+1),weight:1,active:true});save();render()};
+async function testPr(i){const m=S.machines[i],r=await api.test({name:m.id,label:'MACHINE '+(i+1)});toast(r.ok?`اتبعتت صفحة تعريف. اللي تخرج منها هي ${m.label}`:'فشل: '+r.error)}
+const upM=(i,k,v)=>{S.machines[i][k]=k==='weight'?(+v||1):v;save();if(k==='active')render()};
+const upP=(i,k,v)=>{S.papers[i][k]=['name','bin'].includes(k)?v:(+v||0);save()};
+async function importData(){const d=await api.dataImport();if(!d||!d.papers)return toast('الملف مش صالح');if(!confirm('هيتبدل كل البيانات الحالية بالنسخة دي. متأكد؟'))return;S=d;migrate();save();form=blank();render();toast('اتسترجعت البيانات')}
+function settingsTab(){
+  const free=found.filter(p=>!S.machines.some(m=>m.id===p.name));
+  return `<section class="card"><h2>الماكينات</h2><p class="mute" style="margin-top:-6px">اضغط «اكتشاف» والبرنامج يقرا طابعات ويندوز. سمّي كل واحدة، و«صفحة تعريف» بتطبع رقم على الماكينة عشان تعرفها.</p>
+   <button class="btn lime" onclick="detect()">اكتشاف الطابعات</button> <span class="mute">${esc(diag)}</span>
+   ${free.length?`<div style="margin:12px 0">${free.map(p=>`<div class="row r5" style="grid-template-columns:1fr auto"><span>${esc(p.name)}</span><button class="btn sm" onclick="addPr(found.find(x=>x.name===this.dataset.n).name)" data-n="${esc(p.name)}">ضيف</button></div>`).join('')}</div>`:''}
+   <div class="acts" style="margin:12px 0"><input id="mn" placeholder="أو اكتب اسم الطابعة بالظبط زي ما هو في ويندوز" style="flex:1"><button class="btn sm" onclick="addPr($('#mn').value.trim())">ضيف يدوي</button></div>
+   ${S.machines.map((m,i)=>`<div class="row r5"><input value="${esc(m.label)}" onchange="upM(${i},'label',this.value)"><input type="number" min="0.5" step="0.5" value="${m.weight}" title="السرعة النسبية" onchange="upM(${i},'weight',this.value)"><label class="ck"><input type="checkbox" ${m.active?'checked':''} onchange="upM(${i},'active',this.checked)">شغالة</label><button class="btn sm ghost" onclick="testPr(${i})">صفحة تعريف</button><button class="btn sm red" onclick="if(confirm('تحذف الماكينة؟')){S.machines.splice(${i},1);save();render()}">حذف</button><span class="mute" style="grid-column:1/-1;margin-top:-4px">${esc(m.id)}${found.length&&!found.some(p=>p.name===m.id)?' <span class="tag failed">مش ظاهرة في ويندوز</span>':''}</span></div>`).join('')}
+   <p class="mute">الرقم التاني = السرعة النسبية. اللي سرعتها ٢ بتاخد ضعف نسخ اللي سرعتها ١.</p></section>
+  <section class="card"><h2>أنواع الورق والأسعار (مقاس A4)</h2>
+   <div class="row r6 mute"><span>النوع</span><span>تكلفة وش</span><span>تكلفة وش وضهر</span><span>بيع وش</span><span>بيع وش وضهر</span><span>درج</span></div>
+   ${S.papers.map((p,i)=>`<div class="row r6"><input value="${esc(p.name)}" onchange="upP(${i},'name',this.value)">${['single','duplex','ss','sd'].map(k=>`<input type="number" step="0.05" min="0" value="${p[k]}" onchange="upP(${i},'${k}',this.value)">`).join('')}<input value="${esc(p.bin)}" placeholder="—" onchange="upP(${i},'bin',this.value)"></div>`).join('')}
+   <div class="acts"><button class="btn sm lime" onclick="S.papers.push({id:uid(),name:'نوع جديد',single:0,duplex:0,ss:0,sd:0,bin:''});save();render()">+ نوع ورق</button></div>
+   <h3>معامل المقاس (نسبة من A4)</h3><div class="g">${SIZES.map(s=>`<div><label class="f">${s}</label><input type="number" step="0.05" min="0" value="${S.factors[s]}" onchange="S.factors['${s}']=+this.value||0;save()"></div>`).join('')}</div>
+   <h3>اسم المقاس عند تعريف الطابعة (لو مختلف)</h3><div class="g">${['A3+','A3','A5','A6'].map(s=>`<div><label class="f">${s}</label><input value="${esc(S.driverSize[s]||'')}" onchange="S.driverSize['${s}']=this.value.trim();save()"></div>`).join('')}</div></section>
+  <section class="card"><h2>البيانات</h2><p class="mute" style="margin-top:-6px">كل بياناتك في ملف واحد على جهازك. بيتعمل منه نسخة احتياطية تلقائية كل يوم (آخر ٣٠ يوم). تحديث البرنامج مبيمسحش البيانات.</p>
+   <div class="mute" style="direction:ltr;text-align:left;margin-bottom:10px">${esc(info.path||'')}</div>
+   <div class="acts"><button class="btn sm ghost" onclick="api.dataOpen()">فتح فولدر البيانات</button><button class="btn sm lime" onclick="api.dataExport().then(r=>r&&toast('اتحفظت النسخة'))">حفظ نسخة احتياطية</button><button class="btn sm ghost" onclick="importData()">استرجاع من نسخة</button></div></section>`;
+}
+
+/* ---------- shell ---------- */
+function go(k){tab=k;if(k==='set'&&!S.machines.length&&!found.length)detect();else render()}
+function render(){
+  const w=S.queue.filter(j=>['waiting','printing'].includes(j.status)).length,t=dTot(today());
+  $('#nav').innerHTML=Object.keys(TITLES).map(k=>`<button class="${tab===k?'on':''}" onclick="go('${k}')"><svg class="i" viewBox="0 0 24 24">${ICON[k]}</svg><span>${TITLES[k]}</span>${k==='queue'&&w?`<i class="bd">${AR(w)}</i>`:''}</button>`).join('');
+  $('#top').innerHTML=`<h1>${TITLES[tab]}</h1><div class="chips2"><span class="chip2">النهاردة: <b>${AR(t.sheets)}</b> ورقة</span><span class="chip2">الإيراد: <b>${EGP(t.rev)}</b></span></div>`;
+  $('#ver').textContent=info.version?'الإصدار '+info.version:'';
+  $('#app').innerHTML={new:newTab,queue:queueTab,pinned:pinnedTab,acc:accTab,stats:statsTab,set:settingsTab}[tab]();
+}
+document.addEventListener('dragover',e=>e.preventDefault());
+document.addEventListener('drop',e=>{e.preventDefault();loadFiles([...e.dataTransfer.files].map(f=>api.pathOf(f)).filter(p=>/\.(pdf|jpe?g|png)$/i.test(p)))});
+document.addEventListener('keydown',e=>{if(e.ctrlKey&&e.key==='o'){e.preventDefault();pickFile()}if(e.ctrlKey&&e.key==='Enter'&&tab==='new')submit(1)});
+(async()=>{S=await api.get();migrate();info=await api.dataInfo();form=blank();render()})();
+</script>
+</body>
+</html>

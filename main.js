@@ -1,0 +1,92 @@
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
+const path = require('path'), fs = require('fs'), os = require('os');
+const { execFile } = require('child_process');
+const { PDFDocument, StandardFonts, rgb } = require('pdf-lib');
+const { print, getPrinters } = require('pdf-to-printer');
+const { compose } = require('./compose');
+
+let win;
+const DIR = () => app.getPath('userData'), DB = () => path.join(DIR(), 'mulhim.json');
+const MM = v => v * 72 / 25.4, cancelled = new Set();
+
+function backup() { // one backup per day, keep last 30
+  try {
+    const b = path.join(DIR(), 'backups'); fs.mkdirSync(b, { recursive: true });
+    const f = path.join(b, 'mulhim-' + new Date().toLocaleDateString('en-CA') + '.json');
+    if (fs.existsSync(DB()) && !fs.existsSync(f)) fs.copyFileSync(DB(), f);
+    fs.readdirSync(b).sort().slice(0, -30).forEach(x => fs.unlinkSync(path.join(b, x)));
+  } catch {}
+}
+app.whenReady().then(() => {
+  backup();
+  win = new BrowserWindow({ width: 1320, height: 860, autoHideMenuBar: true, title: 'ملهم طباعة', webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true } });
+  win.loadFile('index.html');
+});
+app.on('window-all-closed', () => app.quit());
+
+ipcMain.handle('store:get', () => { try { return JSON.parse(fs.readFileSync(DB(), 'utf8')); } catch { return null; } });
+ipcMain.handle('store:set', (_, d) => { fs.writeFileSync(DB() + '.tmp', JSON.stringify(d)); fs.renameSync(DB() + '.tmp', DB()); return true; });
+ipcMain.handle('data:info', () => ({ path: DB(), dir: DIR(), version: app.getVersion(), size: fs.existsSync(DB()) ? fs.statSync(DB()).size : 0 }));
+ipcMain.handle('data:open', () => shell.openPath(DIR()));
+ipcMain.handle('data:export', async () => {
+  const r = await dialog.showSaveDialog({ defaultPath: 'mulhim-backup-' + new Date().toLocaleDateString('en-CA') + '.json' });
+  if (r.canceled) return false; fs.copyFileSync(DB(), r.filePath); return true;
+});
+ipcMain.handle('data:import', async () => {
+  const r = await dialog.showOpenDialog({ properties: ['openFile'], filters: [{ name: 'JSON', extensions: ['json'] }] });
+  if (r.canceled) return null;
+  try { return JSON.parse(fs.readFileSync(r.filePaths[0], 'utf8')); } catch { return null; }
+});
+ipcMain.handle('file:save', async (_, { name, text }) => {
+  const r = await dialog.showSaveDialog({ defaultPath: name });
+  if (r.canceled) return false; fs.writeFileSync(r.filePath, text, 'utf8'); return true;
+});
+
+// printers: Windows-native list first (most reliable), pdf-to-printer as fallback
+ipcMain.handle('printers:list', async () => {
+  const out = new Map(), errs = [];
+  try { (await win.webContents.getPrintersAsync()).forEach(p => out.set(p.name, { name: p.name })); } catch (e) { errs.push('native: ' + e.message); }
+  try { (await getPrinters()).forEach(p => { const n = p.name || p.deviceId; if (n && !out.has(n)) out.set(n, { name: n }); }); } catch (e) { errs.push('fallback: ' + e.message); }
+  return { list: [...out.values()], errs };
+});
+ipcMain.handle('printers:test', async (_, { name, label }) => {
+  try {
+    const d = await PDFDocument.create(), pg = d.addPage([MM(210), MM(297)]), f = await d.embedFont(StandardFonts.HelveticaBold);
+    pg.drawText(label, { x: 50, y: 520, size: 60, font: f, color: rgb(0, 0, 0) });
+    pg.drawText(name.replace(/[^\x20-\x7e]/g, '?'), { x: 50, y: 470, size: 14, font: f });
+    const file = path.join(os.tmpdir(), 'mulhim-test.pdf'); fs.writeFileSync(file, await d.save());
+    await print(file, { printer: name, silent: true }); return { ok: true };
+  } catch (e) { return { ok: false, error: String(e.message || e) }; }
+});
+ipcMain.handle('printers:purge', async (_, names) => {
+  const res = [];
+  for (const n of names) await new Promise(r => execFile('powershell', ['-NoProfile', '-Command', `Get-PrintJob -PrinterName '${n.replace(/'/g, "''")}' | Remove-PrintJob`], { windowsHide: true }, e => { res.push(e ? 'خطأ' : 'تمام'); r(); }));
+  return res;
+});
+
+ipcMain.handle('file:pick', async () => {
+  const r = await dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'], filters: [{ name: 'PDF / صور', extensions: ['pdf', 'jpg', 'jpeg', 'png'] }] });
+  return r.canceled ? [] : r.filePaths;
+});
+ipcMain.handle('file:info', async (_, p) => {
+  const ext = path.extname(p).toLowerCase(); let pages = 1;
+  if (ext === '.pdf') pages = (await PDFDocument.load(fs.readFileSync(p), { ignoreEncryption: true })).getPageCount();
+  return { path: p, name: path.basename(p), type: ext === '.pdf' ? 'pdf' : 'img', pages };
+});
+
+ipcMain.handle('job:cancel', (_, id) => { cancelled.add(id); return true; });
+ipcMain.handle('job:run', async (_, j) => {
+  cancelled.delete(j.id);
+  try {
+    const f = await compose(j);
+    const land = j.layout === 'nup2' || j.layout === 'booklet', dup = j.duplex || j.layout === 'booklet';
+    const side = !dup ? 'simplex' : j.edge === 'long' ? 'duplexlong' : j.edge === 'short' ? 'duplexshort' : (land ? 'duplexshort' : 'duplexlong');
+    for (const [printer, n] of Object.entries(j.alloc)) {
+      if (!n) continue;
+      if (cancelled.has(j.id)) break;
+      await print(f, { printer, copies: n, silent: true, scale: 'noscale', monochrome: !j.color, orientation: land ? 'landscape' : 'portrait', side, paperSize: j.driverSize || undefined, bin: j.bin || undefined });
+    }
+    fs.unlink(f, () => {});
+    return { ok: true };
+  } catch (e) { return { ok: false, error: String(e.message || e) }; }
+});

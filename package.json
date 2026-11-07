@@ -1,0 +1,28 @@
+{
+  "name": "mulhim-print",
+  "version": "0.2.0",
+  "description": "ملهم طباعة",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win portable"
+  },
+  "dependencies": {
+    "pdf-lib": "^1.17.1",
+    "pdf-to-printer": "^5.6.0"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.mulhim.print",
+    "productName": "Mulhim Print",
+    "win": {
+      "target": "portable"
+    },
+    "asarUnpack": [
+      "node_modules/pdf-to-printer/**/*"
+    ]
+  }
+}
