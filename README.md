@@ -1,10 +1,9 @@
-# ملهم طباعة v0.3
+# ملهم طباعة v0.3.1
 
-## تحديث البرنامج على GitHub
-1. فك الـ zip الجديد.
-2. في الريبو: Add file ← Upload files ← اسحب كل الملفات (نفس الأسماء بتتبدل لوحدها).
-3. Commit changes ← استنى البناء في Actions ← نزّل الـ exe الجديد من Artifacts.
-بياناتك مش بتتمسح مع التحديث لأنها محفوظة بره البرنامج.
+## التسطيب
+شغّل ملف Setup اللي بينزل من GitHub Actions ← Next ← Install.
+هيظهر في قايمة Start وعلى سطح المكتب وفي Settings ← Apps.
+التحديث: شغّل Setup الجديد فوق القديم وبياناتك تفضل.
 
 ## مكان البيانات
-%APPDATA%\mulhim-print\mulhim.json  (+ فولدر backups: نسخة كل يوم)
+%APPDATA%\mulhim-print\mulhim.json  (+ فولدر backups)

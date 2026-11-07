@@ -19,7 +19,7 @@ function backup() { // one backup per day, keep last 30
 }
 app.whenReady().then(() => {
   backup(); loadSess();
-  win = new BrowserWindow({ width: 1320, height: 860, autoHideMenuBar: true, title: 'ملهم طباعة', webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true } });
+  win = new BrowserWindow({ width: 1320, height: 860, autoHideMenuBar: true, icon: path.join(__dirname, 'build', 'icon.ico'), title: 'ملهم طباعة', webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true } });
   win.loadFile('index.html');
 });
 app.on('window-all-closed', () => app.quit());

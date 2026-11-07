@@ -1,11 +1,11 @@
 {
   "name": "mulhim-print",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "ملهم طباعة",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder --win portable"
+    "dist": "electron-builder --win"
   },
   "dependencies": {
     "pdf-lib": "^1.17.1",
@@ -19,7 +19,16 @@
     "appId": "com.mulhim.print",
     "productName": "Mulhim Print",
     "win": {
-      "target": "portable"
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "ملهم طباعة"
     },
     "asarUnpack": [
       "node_modules/pdf-to-printer/**/*"
