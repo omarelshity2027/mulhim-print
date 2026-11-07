@@ -68,19 +68,19 @@ table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:right;
   <aside class="side">
     <div class="brand"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="6" y="26" width="40" height="22" rx="6" fill="#141414"/><rect x="13" y="12" width="26" height="18" rx="3" fill="#fff" stroke="#141414" stroke-width="3"/><rect x="13" y="44" width="26" height="9" rx="2" fill="#fff" stroke="#141414" stroke-width="3"/><circle cx="38" cy="35" r="2.5" fill="#8cc63f"/><path d="M33 34v24l6-6 5 10 4-2-5-10h8z" fill="#8cc63f" stroke="#141414" stroke-width="2.5" stroke-linejoin="round"/><path d="M50 28l5-4M53 35h7M45 25l1-6" stroke="#8cc63f" stroke-width="3" stroke-linecap="round"/></svg><b>ملهم طباعة</b></div>
     <div id="nav" style="display:contents"></div>
-    <div class="ver" id="ver"></div>
+    <div class="ver" id="cl" style="margin-top:auto;color:#b9beb0"></div><div class="ver" id="ver" style="margin-top:0"></div>
   </aside>
   <main class="main"><div class="top" id="top"></div><div id="app"></div></main>
 </div>
 <div id="rep"></div><div class="toast" id="toast"></div>
 <script src="shared.js"></script>
 <script>
-let S,tab='new',form,editing=null,found=[],diag='',range='today',info={};
+let S,tab='new',form,editing=null,found=[],diag='',range='today',info={},cloud={in:false,email:'',last:0,err:'',list:[],busy:false},cTimer;
 const today=()=>new Date().toLocaleDateString('en-CA');
 let acc={date:today(),month:today().slice(0,7)};
 const $=s=>document.querySelector(s),AR=n=>Number(n||0).toLocaleString('ar-EG',{maximumFractionDigits:2}),EGP=n=>AR(n)+' ج';
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const uid=()=>Math.random().toString(36).slice(2,9),save=()=>api.set(S);
+const uid=()=>Math.random().toString(36).slice(2,9),save=()=>{api.set(S);cloudSoon()};
 const sum=(a,f)=>a.reduce((s,x)=>s+(+(typeof f==='function'?f(x):x[f])||0),0);
 const SIZES=['A3','A4','A5','A6','A3+'];
 const LAY={normal:'عادي (صفحة في الوش)',nup2:'صفحتين في الوش',nup4:'٤ صفحات في الوش',booklet:'بوكلت (كتيب)'};
@@ -299,10 +299,25 @@ function settingsTab(){
    <div class="acts"><button class="btn sm lime" onclick="S.papers.push({id:uid(),name:'نوع جديد',single:0,duplex:0,ss:0,sd:0,bin:''});save();render()">+ نوع ورق</button></div>
    <h3>معامل المقاس (نسبة من A4)</h3><div class="g">${SIZES.map(s=>`<div><label class="f">${s}</label><input type="number" step="0.05" min="0" value="${S.factors[s]}" onchange="S.factors['${s}']=+this.value||0;save()"></div>`).join('')}</div>
    <h3>اسم المقاس عند تعريف الطابعة (لو مختلف)</h3><div class="g">${['A3+','A3','A5','A6'].map(s=>`<div><label class="f">${s}</label><input value="${esc(S.driverSize[s]||'')}" onchange="S.driverSize['${s}']=this.value.trim();save()"></div>`).join('')}</div></section>
+  <section class="card"><h2>النسخ الاحتياطي على السحابة (Supabase)</h2>
+   ${cloud.in?`<p style="margin:0 0 10px">متصل بحساب <b>${esc(cloud.email)}</b>. بيترفع تلقائي بعد أي تغيير.</p>${cloud.err?`<div class="warn">${esc(cloud.err)}</div>`:''}
+   <div class="acts"><button class="btn sm lime" onclick="cloudPush().then(r=>r&&toast(r.ok?'اترفعت النسخة':'فشل: '+r.error))">ارفع دلوقتي</button><button class="btn sm ghost" onclick="loadCloudList()">اعرض النسخ المحفوظة</button><button class="btn sm red" onclick="cloudLogout()">تسجيل خروج</button></div>
+   ${cloud.list.length?`<table style="margin-top:10px"><tr><th>اليوم</th><th>آخر تحديث</th><th></th></tr>${cloud.list.map(b=>`<tr><td>${b.day}</td><td>${new Date(b.updated_at).toLocaleString('ar-EG')}</td><td><button class="btn sm ghost" onclick="cloudRestore('${b.day}')">استرجاع</button></td></tr>`).join('')}</table>`:''}`
+   :`<p class="mute" style="margin-top:-6px">سجّل بالإيميل والباسورد اللي عملتهم في Supabase. البيانات بتتحفظ على جهازك الأول، وتترفع نسخة كل يوم على حسابك بس.</p>${cloud.err?`<div class="warn">${esc(cloud.err)}</div>`:''}
+   <div class="g"><div><label class="f">الإيميل</label><input id="ce" type="email" dir="ltr"></div><div><label class="f">الباسورد</label><input id="cp" type="password" dir="ltr" onkeydown="if(event.key==='Enter')cloudLogin()"></div></div><button class="btn lime" onclick="cloudLogin()">تسجيل دخول</button>`}</section>
   <section class="card"><h2>البيانات</h2><p class="mute" style="margin-top:-6px">كل بياناتك في ملف واحد على جهازك. بيتعمل منه نسخة احتياطية تلقائية كل يوم (آخر ٣٠ يوم). تحديث البرنامج مبيمسحش البيانات.</p>
    <div class="mute" style="direction:ltr;text-align:left;margin-bottom:10px">${esc(info.path||'')}</div>
    <div class="acts"><button class="btn sm ghost" onclick="api.dataOpen()">فتح فولدر البيانات</button><button class="btn sm lime" onclick="api.dataExport().then(r=>r&&toast('اتحفظت النسخة'))">حفظ نسخة احتياطية</button><button class="btn sm ghost" onclick="importData()">استرجاع من نسخة</button></div></section>`;
 }
+
+/* ---------- cloud (Supabase) ---------- */
+function cloudSoon(){if(!cloud.in)return;clearTimeout(cTimer);cTimer=setTimeout(cloudPush,15000)}
+async function cloudPush(){if(!cloud.in)return;cloud.busy=true;const r=await api.cloudPush(S);cloud.busy=false;if(r.ok){cloud.last=r.at;cloud.err=''}else{cloud.err=r.error;if(/سجّل دخول/.test(r.error))cloud.in=false}stat();if(tab==='set')render();return r}
+const stat=()=>{const e=$('#cl');if(!e)return;e.textContent=!cloud.in?'☁ غير متصل بالسحابة':cloud.err?'☁ فشل الرفع — هنعيد المحاولة':cloud.busy?'☁ بيرفع…':cloud.last?'☁ اترفع '+new Date(cloud.last).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'}):'☁ متصل'};
+async function cloudLogin(){const r=await api.cloudLogin({email:$('#ce').value.trim(),password:$('#cp').value});if(!r.ok){cloud.err=r.error;toast(r.error);return}cloud.in=true;cloud.email=$('#ce').value.trim();cloud.err='';toast(r.persisted?'اتسجل دخول':'اتسجل دخول (هتحتاج تدخل تاني بعد غلق البرنامج)');await cloudPush();loadCloudList()}
+async function cloudLogout(){await api.cloudLogout();cloud={in:false,email:'',last:0,err:'',list:[],busy:false};stat();render()}
+async function loadCloudList(){const r=await api.cloudList();cloud.list=r.ok?r.list:[];if(!r.ok)cloud.err=r.error;render()}
+async function cloudRestore(day){if(!confirm(`هيتبدل كل اللي على الجهاز بنسخة ${day}. متأكد؟`))return;const r=await api.cloudPull(day);if(!r.ok||!r.data)return toast('فشل الاسترجاع: '+(r.error||'النسخة فاضية'));await api.set(S);S=r.data;migrate();api.set(S);form=blank();render();toast('اتسترجعت النسخة')}
 
 /* ---------- shell ---------- */
 function go(k){tab=k;if(k==='set'&&!S.machines.length&&!found.length)detect();else render()}
@@ -310,13 +325,13 @@ function render(){
   const w=S.queue.filter(j=>['waiting','printing'].includes(j.status)).length,t=dTot(today());
   $('#nav').innerHTML=Object.keys(TITLES).map(k=>`<button class="${tab===k?'on':''}" onclick="go('${k}')"><svg class="i" viewBox="0 0 24 24">${ICON[k]}</svg><span>${TITLES[k]}</span>${k==='queue'&&w?`<i class="bd">${AR(w)}</i>`:''}</button>`).join('');
   $('#top').innerHTML=`<h1>${TITLES[tab]}</h1><div class="chips2"><span class="chip2">النهاردة: <b>${AR(t.sheets)}</b> ورقة</span><span class="chip2">الإيراد: <b>${EGP(t.rev)}</b></span></div>`;
-  $('#ver').textContent=info.version?'الإصدار '+info.version:'';
+  $('#ver').textContent=info.version?'الإصدار '+info.version:'';stat();
   $('#app').innerHTML={new:newTab,queue:queueTab,pinned:pinnedTab,acc:accTab,stats:statsTab,set:settingsTab}[tab]();
 }
 document.addEventListener('dragover',e=>e.preventDefault());
 document.addEventListener('drop',e=>{e.preventDefault();loadFiles([...e.dataTransfer.files].map(f=>api.pathOf(f)).filter(p=>/\.(pdf|jpe?g|png)$/i.test(p)))});
 document.addEventListener('keydown',e=>{if(e.ctrlKey&&e.key==='o'){e.preventDefault();pickFile()}if(e.ctrlKey&&e.key==='Enter'&&tab==='new')submit(1)});
-(async()=>{S=await api.get();migrate();info=await api.dataInfo();form=blank();render()})();
+(async()=>{S=await api.get();migrate();info=await api.dataInfo();form=blank();const c=await api.cloudStatus();cloud.in=c.in;cloud.email=c.email;render();stat();if(cloud.in)cloudPush()})();
 </script>
 </body>
 </html>

@@ -6,5 +6,6 @@ contextBridge.exposeInMainWorld('api', {
   get: () => inv('store:get'), set: d => inv('store:set', d),
   run: j => inv('job:run', j), cancel: id => inv('job:cancel', id),
   dataInfo: () => inv('data:info'), dataOpen: () => inv('data:open'), dataExport: () => inv('data:export'), dataImport: () => inv('data:import'),
+  cloudStatus: () => inv('cloud:status'), cloudLogin: a => inv('cloud:login', a), cloudLogout: () => inv('cloud:logout'), cloudPush: d => inv('cloud:push', d), cloudList: () => inv('cloud:list'), cloudPull: d => inv('cloud:pull', d),
   pathOf: f => webUtils.getPathForFile(f)
 });

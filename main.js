@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell, safeStorage } = require('electron');
 const path = require('path'), fs = require('fs'), os = require('os');
 const { execFile } = require('child_process');
 const { PDFDocument, StandardFonts, rgb } = require('pdf-lib');
@@ -18,7 +18,7 @@ function backup() { // one backup per day, keep last 30
   } catch {}
 }
 app.whenReady().then(() => {
-  backup();
+  backup(); loadSess();
   win = new BrowserWindow({ width: 1320, height: 860, autoHideMenuBar: true, title: 'ملهم طباعة', webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true } });
   win.loadFile('index.html');
 });
@@ -89,4 +89,60 @@ ipcMain.handle('job:run', async (_, j) => {
     fs.unlink(f, () => {});
     return { ok: true };
   } catch (e) { return { ok: false, error: String(e.message || e) }; }
+});
+
+// ---------- Supabase cloud backup (publishable key is safe: RLS limits every row to the signed-in user) ----------
+const SB = { url: 'https://hkmtvvowygldmunhxjhz.supabase.co', key: 'sb_publishable_jDaXEn4bHrXdBWZzBLoWqA_jYsMsIJz' };
+let sess = null;
+const SF = () => path.join(DIR(), 'session.bin');
+function loadSess() { try { if (safeStorage.isEncryptionAvailable()) sess = JSON.parse(safeStorage.decryptString(fs.readFileSync(SF()))); } catch {} }
+function saveSess() { try { if (sess && safeStorage.isEncryptionAvailable()) fs.writeFileSync(SF(), safeStorage.encryptString(JSON.stringify(sess))); else fs.rmSync(SF(), { force: true }); } catch {} }
+async function takeToken(r, email) {
+  const j = await r.json();
+  if (!r.ok) throw new Error(j.error_description || j.msg || j.message || 'خطأ');
+  sess = { access: j.access_token, refresh: j.refresh_token, exp: Date.now() + (j.expires_in - 60) * 1000, email: email || sess?.email || j.user?.email || '' };
+  saveSess();
+}
+async function token() {
+  if (!sess) throw new Error('مش مسجل دخول');
+  if (Date.now() > sess.exp) {
+    try {
+      await takeToken(await fetch(`${SB.url}/auth/v1/token?grant_type=refresh_token`, { method: 'POST', headers: { apikey: SB.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: sess.refresh }) }));
+    } catch (e) { sess = null; saveSess(); throw new Error('سجّل دخول تاني'); }
+  }
+  return sess.access;
+}
+async function rest(p, opt = {}) {
+  const t = await token();
+  const r = await fetch(SB.url + '/rest/v1/' + p, { ...opt, headers: { apikey: SB.key, Authorization: 'Bearer ' + t, 'Content-Type': 'application/json', ...(opt.headers || {}) } });
+  if (!r.ok) throw new Error((await r.text()).slice(0, 200));
+  return r.json().catch(() => null);
+}
+ipcMain.handle('cloud:status', () => ({ in: !!sess, email: sess?.email || '' }));
+ipcMain.handle('cloud:logout', () => { sess = null; saveSess(); return true; });
+ipcMain.handle('cloud:login', async (_, { email, password }) => {
+  try {
+    await takeToken(await fetch(`${SB.url}/auth/v1/token?grant_type=password`, { method: 'POST', headers: { apikey: SB.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) }), email);
+    return { ok: true, persisted: safeStorage.isEncryptionAvailable() };
+  } catch (e) { return { ok: false, error: /invalid|credentials/i.test(e.message) ? 'الإيميل أو الباسورد غلط' : 'مفيش اتصال أو خطأ: ' + e.message }; }
+});
+ipcMain.handle('cloud:push', async (_, data) => {
+  try {
+    const day = new Date().toLocaleDateString('en-CA');
+    await rest('mulhim_backups?on_conflict=user_id,day', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify([{ day, data, app_version: app.getVersion(), updated_at: new Date().toISOString() }]) });
+    const old = new Date(Date.now() - 90 * 864e5).toLocaleDateString('en-CA');
+    rest('mulhim_backups?day=lt.' + old, { method: 'DELETE' }).catch(() => {});
+    return { ok: true, at: Date.now() };
+  } catch (e) { return { ok: false, error: e.message }; }
+});
+ipcMain.handle('cloud:list', async () => {
+  try { return { ok: true, list: await rest('mulhim_backups?select=day,updated_at,app_version&order=day.desc&limit=30') || [] }; }
+  catch (e) { return { ok: false, error: e.message }; }
+});
+ipcMain.handle('cloud:pull', async (_, day) => {
+  try {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) throw new Error('تاريخ غلط');
+    const r = await rest(`mulhim_backups?select=data&day=eq.${day}&limit=1`);
+    return { ok: true, data: r?.[0]?.data || null };
+  } catch (e) { return { ok: false, error: e.message }; }
 });
